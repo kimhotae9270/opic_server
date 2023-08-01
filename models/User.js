@@ -76,6 +76,19 @@ userSchema.methods.generateToken = async function(cb)  {
     })
 }
 
+userSchema.statics.findByToken = function(token, cb) {
+    var user = this
+    //토큰 디코드
+    jwt.verify(token, process.env.OPIC_TOKEN, async function(err,decoded){
+        //유저 아이디를 이용하서 유저를 찾은 다음에
+        //클라이언트에서 가져온 토큰과 디비에 보관된 토큰이 일치하는지 확인
+        await user.findOne({"_id": decoded, "token": token}).then( function(user){
+            if(!user){console.log("찾기 실패")}
+            cb(null,user)
+        })
+    } )
+}
+
 const User = mongoose.model('User',userSchema)//모델로 스키마를 감쌈
 
 module.exports={User}//다른 곳에서도 쓸수있게 함

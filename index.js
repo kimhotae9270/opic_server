@@ -4,11 +4,16 @@ const cors = require("cors");
 const { callChatGPT } = require("./chatgpt");
 const mongoose = require('mongoose');
 const {FeedBack} = require('./models/FeedBack');
+const {auth} = require('./middleware/auth')
 const {User} = require('./models/User'); //User 모델을 가져옴
+const cookieParser = require('cookie-parser');
+const { MongoClient, ObjectId } = require('mongodb');
+const fs = require('fs');
+
 
 const app = express(); //가져온 express 모듈의 function을 이용해서 새로운 express 앱을 만든다. 🔥
 const port = 5000; //포트는 4000번 해도되고, 5000번 해도 된다. -> 이번엔 5000번 포트를 백 서버로 두겠다.
-
+app.use(cookieParser());
 app.use(cors());
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -68,11 +73,39 @@ app.post('/login', async (req,res)=>{
       //비밀번호까지 맞다면 토큰을 생성하기
       user.generateToken((user) => {
         //토큰을 저장한다 쿠키 또는 로컬스토리지에 지금은 쿠키
+        console.log(user.token)
         res.cookie('x_auth', user.token)
         .status(200).json({ loginSuccess:true, userId: user._id})
-
+        
       })
     })
+  })
+})
+
+
+app.get('/auth',auth/*미들웨어*/ , (req,res)=>{
+  //여기까지 미들웨어를 통과해 왔다는 얘기는 어스가 트루 라는 말
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth : true,
+    email : req.user.email,
+    name : req.user.name,
+    image : req.user.image,
+    lastname: req.user.lastname,
+    role : req.user.role
+  })
+})
+
+
+app.get('/logout', auth, async (req,res) => {
+  await User.findOneAndUpdate({_id:req.user._id},{token: ""}).then((user) => {
+    return res.status(200).send({
+      success:true
+    })
+  })
+  .catch((err) => {
+    res.json({success: false,err});
   })
 })
 
@@ -87,6 +120,52 @@ app.post('/feedback',async(req,res) => {
   })
 })
 
+app.post('/jsonSave', async(req,res) => {
+
+  const jsonData = req.body;
+
+  const saveJsonToMongoDB = async (data) => {
+    try {
+      const client = await MongoClient.connect(process.env.MONGO_URI, { useUnifiedTopology: true });
+      const db = client.db(process.env.DB_NAME);
+      const collection = db.collection(process.env.COLLECTION_NAME);
+      await collection.updateOne({_id :  new ObjectId(process.env.OBJECT_ID)},{ $set: { categoryList: data.categoryList } });
+      console.log('데이터가 MongoDB에 성공적으로 업데이트되었습니다.');
+      client.close();
+      return res.status(200).json({success: true})
+  
+      
+    } catch (error) {
+      console.error('MongoDB 저장 중 오류가 발생했습니다.', error);
+      return res.json({success: false})
+    }
+  };
+  saveJsonToMongoDB(jsonData);
+  
+})
+
+app.get('/getJson',async (req,res) => {
+  const getDataFromMongoDB = async () => {
+    try {
+      const client = await MongoClient.connect(process.env.MONGO_URI, { useUnifiedTopology: true });
+      const db = client.db(process.env.DB_NAME);
+      const collection = db.collection(process.env.COLLECTION_NAME); // 저장한 컬렉션 이름으로 변경해주세요.
+  
+      const query = {}; // 조회할 조건이 있을 경우 여기에 추가 가능
+      const result = await collection.find(query).toArray();
+  
+      client.close();
+  
+      return res.status(200).json(result[0].categoryList)
+    } catch (error) {
+      console.error('MongoDB 조회 중 오류가 발생했습니다.', error);
+      return null;
+    }
+  };
+  
+  // MongoDB에서 데이터를 조회합니다.
+  getDataFromMongoDB()
+})
 
 
 app.get("/", (req, res) => {
