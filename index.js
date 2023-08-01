@@ -129,7 +129,7 @@ app.post('/jsonSave', async(req,res) => {
       const client = await MongoClient.connect(process.env.MONGO_URI, { useUnifiedTopology: true });
       const db = client.db(process.env.DB_NAME);
       const collection = db.collection(process.env.COLLECTION_NAME);
-      await collection.updateOne({_id :  new ObjectId(process.env.OBJECT_ID)},{ $set: { categoryList: data.categoryList } });
+      await collection.updateOne({_id :  new ObjectId(process.env.OBJECT_ID)},{ $set: { categoryList: data } });
       console.log('데이터가 MongoDB에 성공적으로 업데이트되었습니다.');
       client.close();
       return res.status(200).json({success: true})
