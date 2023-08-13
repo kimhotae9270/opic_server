@@ -15,8 +15,10 @@ const app = express(); //가져온 express 모듈의 function을 이용해서 �
 const port = 5000; //포트는 4000번 해도되고, 5000번 해도 된다. -> 이번엔 5000번 포트를 백 서버로 두겠다.
 app.use(cookieParser());
 app.use(cors());
-app.use(express.json()); // for parsing application/json
-app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(express.json({
+  limit: '1mb'
+})); // for parsing application/json
+app.use(express.urlencoded({ limit: '1mb' ,extended: true })); // for parsing application/x-www-form-urlencoded
 
 mongoose.connect(process.env.MONGO_URI).then(()=> console.log('connect'))
  .catch(err => console.log(err))
@@ -73,7 +75,6 @@ app.post('/login', async (req,res)=>{
       //비밀번호까지 맞다면 토큰을 생성하기
       user.generateToken((user) => {
         //토큰을 저장한다 쿠키 또는 로컬스토리지에 지금은 쿠키
-        console.log(user.token)
         res.cookie('x_auth', user.token)
         .status(200).json({ loginSuccess:true, userId: user._id})
         
