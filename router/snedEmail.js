@@ -6,7 +6,7 @@ const { smtpTransport } = require('../config/Email');
 
 
 router.post('/sendEmail',async (req,res)=>{
-   console.log("이메일",req.body)
+   
    generateRandom = function (min, max) {
    var ranNum = Math.floor(Math.random()*(max-min+1)) + min;
     return ranNum;
