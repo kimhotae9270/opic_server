@@ -1,6 +1,9 @@
 const express = require('express');
 const { UserAnswer } = require('../models/UserAnswer');
+require("dotenv").config();
 const router = express.Router();
+const { MongoClient } = require('mongodb');
+
 
 router.post('/save_answer',async (req,res)=>{
     const userAnswer = new UserAnswer(req.body)
@@ -22,5 +25,53 @@ router.get('/getAnswer', async (req,res) => {
     res.json({success:false, err})
   })
 })
+
+
+router.get('/getCountAnswer', async (req,res)=>{
+  const client = new MongoClient(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try {
+    // MongoDB 서버에 연결
+    await client.connect();
+    const collectionName = "useranswers"
+    const dbName = 'test'
+    // 데이터베이스와 컬렉션을 가져옴
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    // 컬렉션에서 데이터 개수 가져오기
+    const count = await collection.countDocuments();
+
+    res.json({count : count})
+  } finally {
+    // 연결 해제
+    client.close();
+  }
+})
+
+
+router.get('/getUsefulAnwser', async(req,res)=>{
+  const client = new MongoClient(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try {
+    // MongoDB 서버에 연결
+    await client.connect();
+    const collectionName = "useranswers"
+    const dbName = 'test'
+    // 데이터베이스와 컬렉션을 가져옴
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+
+    // title 필드가 존재하는 문서 가져오기
+    const documents = await collection.find({ title: { $exists: true, $ne: "" } }).toArray();
+    const count = await collection.countDocuments({ title: { $ne: "" } });
+    res.json({document : documents, count: count})
+  } finally {
+    // 연결 해제
+    client.close();
+    
+  }
+})
+
 
 module.exports = router;
