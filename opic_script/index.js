@@ -22,7 +22,7 @@ app.use(express.json({
   limit: '1mb'
 })); // for parsing application/json
 app.use(express.urlencoded({ limit: '1mb', extended: true })); // for parsing application/x-www-form-urlencoded
-app.server.timeout = 180000;
+app.timeout = 180000;
 mongoose.connect(process.env.MONGO_URI).then(()=> console.log('connect'))
  .catch(err => console.log(err))
 
