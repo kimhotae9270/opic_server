@@ -39,9 +39,12 @@ app.get("/ask", async function (req, res) {
 });
 
 app.post("/ask", async (req, res) => {
-  console.log("hi");
+  
   const prompt = req.body.prompt;
-  const temNum = req.body.temNum;
+  var temNum = req.body.temNum;
+  if (temNum == undefined){
+    temNum = 0
+  }
   const response = await callChatGPT(prompt, temNum);
 
   if (response) {
