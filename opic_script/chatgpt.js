@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { Configuration, OpenAIApi } = require("openai");
-
+app.server.timeout = 180000;
 async function callChatGPT(prompt,temNum) {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
