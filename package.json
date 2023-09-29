@@ -19,6 +19,7 @@
   "homepage": "https://github.com/dlguswn3659/OPIc-Script-Generator-Server#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "chromedriver": "^117.0.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -27,6 +28,8 @@
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.0",
     "nodemailer": "^6.9.4",
-    "openai": "^3.2.1"
+    "openai": "^3.2.1",
+    "puppeteer": "^21.3.5",
+    "selenium-webdriver": "^4.13.0"
   }
 }

@@ -46,6 +46,7 @@ router.post('/copy',async (req,res) =>{
       res.json({success:true})
     } catch (error) {
       console.error('에러 발생:', error);
+      await driver.quit();
       res.json({success:false})
     }
   })();

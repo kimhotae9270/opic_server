@@ -9,17 +9,20 @@ const {User} = require('./models/User'); //User 모델을 가져옴
 const cookieParser = require('cookie-parser');
 const { MongoClient, ObjectId } = require('mongodb');
 const fs = require('fs');
+const Quizlet = require('./router/Quizlet')
 const UserAnswer = require('./router/UserAnswerAPI')
 const Email = require('./router/snedEmail')
+const Student = require('./router/Student')
 const app = express(); //가져온 express 모듈의 function을 이용해서 새로운 express 앱을 만든다. 🔥
 const port = 5000; //포트는 4000번 해도되고, 5000번 해도 된다. -> 이번엔 5000번 포트를 백 서버로 두겠다.
+
 app.use(cookieParser());
 app.use(cors());
 app.use(express.json({
   limit: '1mb'
 })); // for parsing application/json
 app.use(express.urlencoded({ limit: '1mb', extended: true })); // for parsing application/x-www-form-urlencoded
-
+app.timeout = 180000;
 mongoose.connect(process.env.MONGO_URI).then(()=> console.log('connect'))
  .catch(err => console.log(err))
 
@@ -36,9 +39,14 @@ app.get("/ask", async function (req, res) {
 });
 
 app.post("/ask", async (req, res) => {
-  console.log("hi");
+  
   const prompt = req.body.prompt;
-  const response = await callChatGPT(prompt);
+  var temNum = req.body.temNum;
+  if (temNum == undefined){
+    temNum = 0
+  }
+  console.log(temNum)
+  const response = await callChatGPT(prompt, temNum);
 
   if (response) {
     res.json({ response: response });
@@ -187,6 +195,8 @@ app.get("/", (req, res) => {
 
 app.use('/api/answer', UserAnswer)
 app.use('/api/email',Email)
+app.use('/api/quizlet', Quizlet)
+app.use('/api/Student', Student)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
