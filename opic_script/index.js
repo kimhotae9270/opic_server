@@ -45,6 +45,7 @@ app.post("/ask", async (req, res) => {
   if (temNum == undefined){
     temNum = 0
   }
+  console.log(temNum)
   const response = await callChatGPT(prompt, temNum);
 
   if (response) {
