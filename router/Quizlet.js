@@ -21,8 +21,8 @@ router.post('/copy',async (req,res) =>{
   options.addArguments('--ignore-certificate-errors')
   options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36")
   options.addArguments("app-version=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36")
-  
-  
+  options.addArguments('--user-data-dir=C:\\Temp\\chrome');
+  options.addArguments(`--remote-debugging-port=9222`);
   // 웹 드라이버 생성 (Chrome 사용)
   const driver = new Builder()
     .forBrowser('chrome')
@@ -40,9 +40,9 @@ router.post('/copy',async (req,res) =>{
       // 웹 페이지의 내용을 출력 (예: 페이지 소스)
       //const pageSource = await driver.getPageSource();
       //console.log(pageSource);
-  
+      
       // 브라우저 종료
-      await driver.quit();
+      
       res.json({success:true})
     } catch (error) {
       console.error('에러 발생:', error);

@@ -196,7 +196,7 @@ app.get("/", (req, res) => {
 app.use('/api/answer', UserAnswer)
 app.use('/api/email',Email)
 app.use('/api/quizlet', Quizlet)
-app.use('/api/Student', Student)
+app.use('/api/student', Student)
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);

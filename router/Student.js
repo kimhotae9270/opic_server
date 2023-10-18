@@ -47,8 +47,14 @@ router.post('/saveTranslated',async (req,res) => {
 })
 
 router.get('/getTranslated',async (req,res)=>{
-    await Translated.find({phoneNum: req.body.phoneNum,name:req.body.name}).then(translated => {
-        if(!translated){
+  if(req.query.name == undefined || req.query.phoneNum == undefined){
+    await Translated.find().sort({ _id: -1 }).then(translated => {
+      res.json({Success : true,translated : translated})
+  
+})
+  }else{
+    await Translated.find({name: req.query.name,phoneNum:req.query.phoneNum}).then(translated => {
+        if(translated.length == 0){
           return res.json({
             Success: false,
             message: "자료가 없습니다"
@@ -57,7 +63,10 @@ router.get('/getTranslated',async (req,res)=>{
             res.json({Success : true,translated : translated})
         }
     })
+  }
 })
+
+
 
 
 module.exports = router;
