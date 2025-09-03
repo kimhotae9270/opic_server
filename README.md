@@ -19,6 +19,3 @@
 - **DB**: MongoDB (+ Mongoose)
 - **Auth**: 쿠키 기반 토큰 인증(서버 저장·검증), bcrypt
 
----
-
-## 📂 Typical Structure
